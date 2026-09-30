@@ -11,6 +11,9 @@ pub struct AppConfig {
     pub auto_approve_enabled: bool,
     pub approval_message: String,
     pub skip_drafts: bool,
+    /// Maximum number of title characters appended to the approval message.
+    #[serde(default)]
+    pub max_title_chars: usize,
 }
 
 impl Default for AppConfig {
@@ -22,6 +25,7 @@ impl Default for AppConfig {
             auto_approve_enabled: true,
             approval_message: String::new(),
             skip_drafts: true,
+            max_title_chars: 20,
         }
     }
 }
