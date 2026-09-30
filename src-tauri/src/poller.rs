@@ -296,11 +296,10 @@ async fn push_and_emit(app: &AppHandle, state: &Arc<AppState>, entry: ActivityEn
 /// approval is easy to recognize in notification emails.
 fn approval_message_for(base: &str, title: &str) -> String {
     const MAX_TITLE: usize = 20;
-    let short = if title.len() > MAX_TITLE {
-        format!("{}…", &title[..MAX_TITLE])
-    } else {
-        title.to_string()
-    };
+    let mut short: String = title.chars().take(MAX_TITLE).collect();
+    if title.chars().count() > MAX_TITLE {
+        short.push('…');
+    }
     if base.trim().is_empty() {
         format!("따봉 ({short})")
     } else {
