@@ -242,8 +242,9 @@ async fn handle_pr(
         return;
     }
 
+    let message = approval_message_for(&cfg.approval_message, &pr.title);
     match client
-        .approve_pull(owner, repo, pr.number, Some(&cfg.approval_message))
+        .approve_pull(owner, repo, pr.number, Some(&message))
         .await
     {
         Ok(()) => {
@@ -289,4 +290,20 @@ async fn handle_pr(
 async fn push_and_emit(app: &AppHandle, state: &Arc<AppState>, entry: ActivityEntry) {
     state.push_activity(entry.clone()).await;
     let _ = app.emit(ACTIVITY_EVENT, &entry);
+}
+
+/// Append a short form of the PR title to the approval message so the
+/// approval is easy to recognize in notification emails.
+fn approval_message_for(base: &str, title: &str) -> String {
+    const MAX_TITLE: usize = 20;
+    let short = if title.len() > MAX_TITLE {
+        format!("{}…", &title[..MAX_TITLE])
+    } else {
+        title.to_string()
+    };
+    if base.trim().is_empty() {
+        format!("따봉 ({short})")
+    } else {
+        format!("{base} ({short})")
+    }
 }
